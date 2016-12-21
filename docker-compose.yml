@@ -5,6 +5,10 @@ services:
     build: docker/php
     expose:
       - "9000"
+    links:
+      - db
+    env_file:
+      - ./.env
     volumes:
       - ./:/app
 
@@ -17,3 +21,12 @@ services:
     volumes:
       - ./:/app
       - ./docker/web/default.conf:/etc/nginx/conf.d/default.conf
+
+  db:
+    image: mysql:5.6
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./.env
+    volumes:
+      - ./install.sql:/docker-entrypoint-initdb.d/import.sql

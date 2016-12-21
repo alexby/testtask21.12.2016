@@ -4,6 +4,7 @@
  */
 
 require_once '../protected/Node.php';
+require_once '../protected/DB.php';
 
 $rootNode = new Node(Node::ROOT_NODE);
 

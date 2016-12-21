@@ -33,22 +33,25 @@ class Node
      */
     public function remove()
     {
-        return true;
+        $db = DB::getInstance();
+        $st = $db->prepare('UPDATE nodes SET deleted = 1 WHERE id = :node_id');
+        $st->bindParam('node_id', $this->id);
+        return $st->execute();
     }
 
     /**
      * Return a list of all children
-     * @return Node[]
+     * @return Node[]|Generator
      */
     public function getChildren()
     {
-        if ($this->id === 5) {
-            return [new Node(10), new Node(10)];
+        $db = DB::getInstance();
+        $st = $db->prepare('SELECT id FROM nodes WHERE parent_id = :parent_id AND deleted = 0');
+        $st->bindParam('parent_id', $this->id);
+        $st->execute();
+        foreach ($st->fetchAll() as $row) {
+            yield new Node($row['id']);
         }
-        if ($this->id === 10) {
-            return [];
-        }
-        return [new Node(5), new Node(5)];
     }
 
     /**
@@ -57,6 +60,9 @@ class Node
      */
     public function createChild()
     {
-        return true;
+        $db = DB::getInstance();
+        $st = $db->prepare('INSERT INTO nodes (parent_id) VALUES (:parent_id);');
+        $st->bindParam('parent_id', $this->id);
+        return $st->execute();
     }
 }
